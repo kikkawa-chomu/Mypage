@@ -36,9 +36,16 @@ revealNodes.forEach((node, index) => {
   node.style.transitionDelay = `${delay}ms`;
 });
 
-const unlockLetter = (observeDelay = 400) => {
+const unlockLetter = (observeDelay = 400, useTransition = true) => {
   if (coverPage) {
-    coverPage.classList.add("is-hidden");
+    if (useTransition) {
+      coverPage.classList.add("is-opening");
+      setTimeout(() => {
+        coverPage.classList.add("is-hidden");
+      }, 420);
+    } else {
+      coverPage.classList.add("is-hidden");
+    }
   }
 
   body.classList.remove("is-locked");
@@ -46,6 +53,9 @@ const unlockLetter = (observeDelay = 400) => {
   if (mainContent) {
     mainContent.classList.remove("main-content-hidden");
     mainContent.classList.add("main-content-visible");
+    if (useTransition) {
+      mainContent.classList.add("is-opening");
+    }
   }
 
   setTimeout(() => {
@@ -57,12 +67,13 @@ const unlockLetter = (observeDelay = 400) => {
 
 if (openLetterBtn) {
   openLetterBtn.addEventListener("click", () => {
+    openLetterBtn.disabled = true;
     unlockLetter();
-  });
+  }, { once: true });
 }
 
 if (window.location.hash && window.location.hash !== "#top") {
-  unlockLetter(0);
+  unlockLetter(0, false);
 }
 
 // --- Existing Interactions ---
@@ -159,4 +170,3 @@ magneticButtons.forEach((button) => {
     button.style.transform = "";
   });
 });
-
