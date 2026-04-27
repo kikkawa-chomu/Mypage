@@ -68,7 +68,6 @@ const unlockLetter = (observeDelay = 400, useTransition = true) => {
 
 if (openLetterBtn) {
   openLetterBtn.addEventListener("click", () => {
-    openLetterBtn.disabled = true;
     unlockLetter();
   }, { once: true });
 }

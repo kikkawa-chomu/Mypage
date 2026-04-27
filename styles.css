@@ -21,6 +21,8 @@
   --page-padding: clamp(24px, 5vw, 48px);
   --cover-transition-ease: cubic-bezier(0.16, 1, 0.3, 1);
   --cover-burst-duration: 880ms;
+  --cover-content-exit-duration: 820ms;
+  --main-content-entry-duration: 920ms;
 }
 
 ::selection {
@@ -105,7 +107,7 @@ body.is-locked {
 }
 
 .cover-page.is-opening .cover-content {
-  animation: coverContentExit 820ms var(--cover-transition-ease) forwards;
+  animation: coverContentExit var(--cover-content-exit-duration) var(--cover-transition-ease) forwards;
 }
 
 .cover-page.is-hidden {
@@ -296,7 +298,7 @@ body.is-locked {
 }
 
 .main-content-visible.is-opening {
-  animation: mainContentEntry 920ms var(--cover-transition-ease) both;
+  animation: mainContentEntry var(--main-content-entry-duration) var(--cover-transition-ease) both;
 }
 
 @keyframes mainContentEntry {
