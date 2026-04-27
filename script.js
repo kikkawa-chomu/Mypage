@@ -28,6 +28,8 @@ const parseDurationMs = (value, fallback) => {
   return fallback;
 };
 
+const COVER_HIDE_PROGRESS = 0.72;
+
 const durationCache = new Map();
 const getCssDurationMs = (variableName, fallback) => {
   if (durationCache.has(variableName)) {
@@ -44,18 +46,21 @@ const getCssDurationMs = (variableName, fallback) => {
 
 const getCoverHideDelay = () => {
   const exitDuration = getCssDurationMs("--cover-content-exit-duration", 820);
-  return Math.max(0, Math.floor(exitDuration * 0.72));
+  return Math.max(0, Math.floor(exitDuration * COVER_HIDE_PROGRESS));
 };
 
 const getMainEntryDuration = () => getCssDurationMs("--main-content-entry-duration", 920);
+
+const toPercentWithinViewport = (value, viewportSize) =>
+  Math.max(0, Math.min((value / viewportSize) * 100, 100));
 
 const setCoverBurstOrigin = (clientX, clientY) => {
   if (!coverPage || typeof clientX !== "number" || typeof clientY !== "number") {
     return;
   }
 
-  const x = Math.max(0, Math.min((clientX / window.innerWidth) * 100, 100));
-  const y = Math.max(0, Math.min((clientY / window.innerHeight) * 100, 100));
+  const x = toPercentWithinViewport(clientX, window.innerWidth);
+  const y = toPercentWithinViewport(clientY, window.innerHeight);
   coverPage.style.setProperty("--cover-burst-x", `${x}%`);
   coverPage.style.setProperty("--cover-burst-y", `${y}%`);
 };
