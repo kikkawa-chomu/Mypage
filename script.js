@@ -28,8 +28,13 @@ const parseDurationMs = (value, fallback) => {
   return fallback;
 };
 
-const getCoverHideDelay = () =>
-  Math.max(
+let cachedCoverHideDelay;
+const getCoverHideDelay = () => {
+  if (typeof cachedCoverHideDelay === "number") {
+    return cachedCoverHideDelay;
+  }
+
+  cachedCoverHideDelay = Math.max(
     0,
     Math.floor(
       parseDurationMs(
@@ -38,6 +43,9 @@ const getCoverHideDelay = () =>
       ) / 2,
     ),
   );
+
+  return cachedCoverHideDelay;
+};
 
 // Setup observer but don't observe yet
 const observer = new IntersectionObserver(
@@ -69,6 +77,7 @@ const unlockLetter = (observeDelay = 400, useTransition = true) => {
     if (useTransition) {
       coverPage.classList.add("is-opening");
       setTimeout(() => {
+        coverPage.classList.remove("is-opening");
         coverPage.classList.add("is-hidden");
       }, getCoverHideDelay());
     } else {
