@@ -11,6 +11,60 @@ const trackedSections = [...document.querySelectorAll("main section[id]")];
 // Elements for scroll reveal
 const revealNodes = document.querySelectorAll(".reveal");
 
+const parseDurationMs = (value, fallback) => {
+  if (!value) {
+    return fallback;
+  }
+
+  const trimmed = value.trim();
+  if (trimmed.endsWith("ms")) {
+    const parsed = Number.parseFloat(trimmed);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  }
+  if (trimmed.endsWith("s")) {
+    const parsed = Number.parseFloat(trimmed);
+    return Number.isFinite(parsed) ? parsed * 1000 : fallback;
+  }
+  return fallback;
+};
+
+const COVER_HIDE_PROGRESS = 0.72;
+
+const durationCache = new Map();
+const getCssDurationMs = (variableName, fallback) => {
+  if (durationCache.has(variableName)) {
+    return durationCache.get(variableName);
+  }
+
+  const duration = parseDurationMs(
+    getComputedStyle(document.documentElement).getPropertyValue(variableName),
+    fallback,
+  );
+  durationCache.set(variableName, duration);
+  return duration;
+};
+
+const getCoverHideDelay = () => {
+  const exitDuration = getCssDurationMs("--cover-content-exit-duration", 820);
+  return Math.max(0, Math.floor(exitDuration * COVER_HIDE_PROGRESS));
+};
+
+const getMainEntryDuration = () => getCssDurationMs("--main-content-entry-duration", 920);
+
+const toPercentWithinViewport = (value, viewportSize) =>
+  Math.max(0, Math.min((value / viewportSize) * 100, 100));
+
+const setCoverBurstOrigin = (clientX, clientY) => {
+  if (!coverPage || typeof clientX !== "number" || typeof clientY !== "number") {
+    return;
+  }
+
+  const x = toPercentWithinViewport(clientX, window.innerWidth);
+  const y = toPercentWithinViewport(clientY, window.innerHeight);
+  coverPage.style.setProperty("--cover-burst-x", `${x}%`);
+  coverPage.style.setProperty("--cover-burst-y", `${y}%`);
+};
+
 // Setup observer but don't observe yet
 const observer = new IntersectionObserver(
   (entries) => {
@@ -36,9 +90,17 @@ revealNodes.forEach((node, index) => {
   node.style.transitionDelay = `${delay}ms`;
 });
 
-const unlockLetter = (observeDelay = 400) => {
+const unlockLetter = (observeDelay = 400, useTransition = true) => {
   if (coverPage) {
-    coverPage.classList.add("is-hidden");
+    if (useTransition) {
+      coverPage.classList.add("is-opening");
+      setTimeout(() => {
+        coverPage.classList.remove("is-opening");
+        coverPage.classList.add("is-hidden");
+      }, getCoverHideDelay());
+    } else {
+      coverPage.classList.add("is-hidden");
+    }
   }
 
   body.classList.remove("is-locked");
@@ -46,6 +108,12 @@ const unlockLetter = (observeDelay = 400) => {
   if (mainContent) {
     mainContent.classList.remove("main-content-hidden");
     mainContent.classList.add("main-content-visible");
+    if (useTransition) {
+      mainContent.classList.add("is-opening");
+      setTimeout(() => {
+        mainContent.classList.remove("is-opening");
+      }, getMainEntryDuration());
+    }
   }
 
   setTimeout(() => {
@@ -56,13 +124,17 @@ const unlockLetter = (observeDelay = 400) => {
 };
 
 if (openLetterBtn) {
-  openLetterBtn.addEventListener("click", () => {
+  openLetterBtn.addEventListener("click", (event) => {
+    if (coverPage && (coverPage.classList.contains("is-opening") || coverPage.classList.contains("is-hidden"))) {
+      return;
+    }
+    setCoverBurstOrigin(event.clientX, event.clientY);
     unlockLetter();
   });
 }
 
 if (window.location.hash && window.location.hash !== "#top") {
-  unlockLetter(0);
+  unlockLetter(0, false);
 }
 
 // --- Existing Interactions ---
@@ -159,4 +231,3 @@ magneticButtons.forEach((button) => {
     button.style.transform = "";
   });
 });
-

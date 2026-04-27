@@ -19,6 +19,11 @@
   --radius-pill: 999px;
   --max-width: 1280px;
   --page-padding: clamp(24px, 5vw, 48px);
+  --cover-transition-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --cover-shell-exit-duration: 980ms;
+  --cover-burst-duration: 880ms;
+  --cover-content-exit-duration: 820ms;
+  --main-content-entry-duration: 920ms;
 }
 
 ::selection {
@@ -72,6 +77,8 @@ body.is-locked {
 
 /* Cover Page */
 .cover-page {
+  --cover-burst-x: 50%;
+  --cover-burst-y: 50%;
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -84,6 +91,45 @@ body.is-locked {
   -webkit-backdrop-filter: blur(24px);
   transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 1.2s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
+  will-change: opacity, transform;
+}
+
+.cover-page::before {
+  content: "";
+  position: absolute;
+  inset: -15%;
+  pointer-events: none;
+  background: linear-gradient(108deg, rgba(255, 255, 255, 0) 38%, rgba(220, 182, 255, 0.42) 50%, rgba(255, 255, 255, 0) 62%);
+  opacity: 0;
+  transform: translate3d(-20%, 0, 0) scaleX(0.8) skewX(-16deg);
+}
+
+.cover-page::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(circle at var(--cover-burst-x) var(--cover-burst-y), rgba(255, 255, 255, 0.48) 0%, rgba(214, 164, 255, 0.16) 26%, rgba(91, 33, 255, 0) 55%),
+    conic-gradient(from 160deg at 50% 50%, transparent 0deg, rgba(214, 164, 255, 0.42) 44deg, transparent 88deg, transparent 360deg);
+  transform: scale(0.7) rotate(-8deg);
+}
+
+.cover-page.is-opening {
+  animation: coverShellExit var(--cover-shell-exit-duration) var(--cover-transition-ease) both;
+}
+
+.cover-page.is-opening::before {
+  animation: coverSweep calc(var(--cover-shell-exit-duration) - 120ms) var(--cover-transition-ease) forwards;
+}
+
+.cover-page.is-opening::after {
+  animation: coverBurst var(--cover-burst-duration) var(--cover-transition-ease) forwards;
+}
+
+.cover-page.is-opening .cover-content {
+  animation: coverContentExit var(--cover-content-exit-duration) var(--cover-transition-ease) forwards;
 }
 
 .cover-page.is-hidden {
@@ -121,6 +167,62 @@ body.is-locked {
 @keyframes coverPulse {
   0% { transform: scale(1); opacity: 0.3; }
   100% { transform: scale(1.2); opacity: 0.6; }
+}
+
+@keyframes coverBurst {
+  0% {
+    opacity: 0;
+    transform: scale(0.72) rotate(-8deg);
+  }
+  20% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4) rotate(8deg);
+  }
+}
+
+@keyframes coverSweep {
+  0% {
+    opacity: 0;
+    transform: translate3d(-28%, 0, 0) scaleX(0.8) skewX(-16deg);
+  }
+  32% {
+    opacity: 0.92;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(28%, 0, 0) scaleX(1.15) skewX(-16deg);
+  }
+}
+
+@keyframes coverShellExit {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  55% {
+    opacity: 0.62;
+    transform: scale(1.015);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes coverContentExit {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.92) translateY(-14px);
+    filter: blur(8px);
+  }
 }
 
 .cover-content {
@@ -244,6 +346,25 @@ body.is-locked {
   transform: translateY(0);
   pointer-events: auto;
   transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.main-content-visible.is-opening {
+  animation: mainContentEntry var(--main-content-entry-duration) var(--cover-transition-ease) both;
+}
+
+@keyframes mainContentEntry {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) scale(0.985);
+    filter: saturate(1.25) blur(3px);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    filter: saturate(1) blur(0);
+  }
 }
 
 body::before {
