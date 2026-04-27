@@ -18,23 +18,26 @@ const parseDurationMs = (value, fallback) => {
 
   const trimmed = value.trim();
   if (trimmed.endsWith("ms")) {
-    return Number.parseFloat(trimmed);
+    const parsed = Number.parseFloat(trimmed);
+    return Number.isFinite(parsed) ? parsed : fallback;
   }
   if (trimmed.endsWith("s")) {
-    return Number.parseFloat(trimmed) * 1000;
+    const parsed = Number.parseFloat(trimmed);
+    return Number.isFinite(parsed) ? parsed * 1000 : fallback;
   }
   return fallback;
 };
 
-const COVER_HIDE_DELAY = Math.max(
-  0,
-  Math.floor(
-    parseDurationMs(
-      getComputedStyle(document.documentElement).getPropertyValue("--cover-content-exit-duration"),
-      820,
-    ) / 2,
-  ),
-);
+const getCoverHideDelay = () =>
+  Math.max(
+    0,
+    Math.floor(
+      parseDurationMs(
+        getComputedStyle(document.documentElement).getPropertyValue("--cover-content-exit-duration"),
+        820,
+      ) / 2,
+    ),
+  );
 
 // Setup observer but don't observe yet
 const observer = new IntersectionObserver(
@@ -67,7 +70,7 @@ const unlockLetter = (observeDelay = 400, useTransition = true) => {
       coverPage.classList.add("is-opening");
       setTimeout(() => {
         coverPage.classList.add("is-hidden");
-      }, COVER_HIDE_DELAY);
+      }, getCoverHideDelay());
     } else {
       coverPage.classList.add("is-hidden");
     }
