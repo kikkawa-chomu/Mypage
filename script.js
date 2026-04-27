@@ -28,23 +28,36 @@ const parseDurationMs = (value, fallback) => {
   return fallback;
 };
 
-let cachedCoverHideDelay;
-const getCoverHideDelay = () => {
-  if (typeof cachedCoverHideDelay === "number") {
-    return cachedCoverHideDelay;
+const durationCache = new Map();
+const getCssDurationMs = (variableName, fallback) => {
+  if (durationCache.has(variableName)) {
+    return durationCache.get(variableName);
   }
 
-  cachedCoverHideDelay = Math.max(
-    0,
-    Math.floor(
-      parseDurationMs(
-        getComputedStyle(document.documentElement).getPropertyValue("--cover-content-exit-duration"),
-        820,
-      ) / 2,
-    ),
+  const duration = parseDurationMs(
+    getComputedStyle(document.documentElement).getPropertyValue(variableName),
+    fallback,
   );
+  durationCache.set(variableName, duration);
+  return duration;
+};
 
-  return cachedCoverHideDelay;
+const getCoverHideDelay = () => {
+  const exitDuration = getCssDurationMs("--cover-content-exit-duration", 820);
+  return Math.max(0, Math.floor(exitDuration * 0.72));
+};
+
+const getMainEntryDuration = () => getCssDurationMs("--main-content-entry-duration", 920);
+
+const setCoverBurstOrigin = (clientX, clientY) => {
+  if (!coverPage || typeof clientX !== "number" || typeof clientY !== "number") {
+    return;
+  }
+
+  const x = Math.max(0, Math.min((clientX / window.innerWidth) * 100, 100));
+  const y = Math.max(0, Math.min((clientY / window.innerHeight) * 100, 100));
+  coverPage.style.setProperty("--cover-burst-x", `${x}%`);
+  coverPage.style.setProperty("--cover-burst-y", `${y}%`);
 };
 
 // Setup observer but don't observe yet
@@ -92,6 +105,9 @@ const unlockLetter = (observeDelay = 400, useTransition = true) => {
     mainContent.classList.add("main-content-visible");
     if (useTransition) {
       mainContent.classList.add("is-opening");
+      setTimeout(() => {
+        mainContent.classList.remove("is-opening");
+      }, getMainEntryDuration());
     }
   }
 
@@ -103,10 +119,11 @@ const unlockLetter = (observeDelay = 400, useTransition = true) => {
 };
 
 if (openLetterBtn) {
-  openLetterBtn.addEventListener("click", () => {
+  openLetterBtn.addEventListener("click", (event) => {
     if (coverPage && (coverPage.classList.contains("is-opening") || coverPage.classList.contains("is-hidden"))) {
       return;
     }
+    setCoverBurstOrigin(event.clientX, event.clientY);
     unlockLetter();
   });
 }
