@@ -10,7 +10,31 @@ const trackedSections = [...document.querySelectorAll("main section[id]")];
 
 // Elements for scroll reveal
 const revealNodes = document.querySelectorAll(".reveal");
-const COVER_HIDE_DELAY = 420;
+
+const parseDurationMs = (value, fallback) => {
+  if (!value) {
+    return fallback;
+  }
+
+  const trimmed = value.trim();
+  if (trimmed.endsWith("ms")) {
+    return Number.parseFloat(trimmed);
+  }
+  if (trimmed.endsWith("s")) {
+    return Number.parseFloat(trimmed) * 1000;
+  }
+  return fallback;
+};
+
+const COVER_HIDE_DELAY = Math.max(
+  0,
+  Math.floor(
+    parseDurationMs(
+      getComputedStyle(document.documentElement).getPropertyValue("--cover-content-exit-duration"),
+      820,
+    ) / 2,
+  ),
+);
 
 // Setup observer but don't observe yet
 const observer = new IntersectionObserver(
@@ -68,8 +92,11 @@ const unlockLetter = (observeDelay = 400, useTransition = true) => {
 
 if (openLetterBtn) {
   openLetterBtn.addEventListener("click", () => {
+    if (coverPage && (coverPage.classList.contains("is-opening") || coverPage.classList.contains("is-hidden"))) {
+      return;
+    }
     unlockLetter();
-  }, { once: true });
+  });
 }
 
 if (window.location.hash && window.location.hash !== "#top") {
