@@ -10,6 +10,7 @@ const trackedSections = [...document.querySelectorAll("main section[id]")];
 
 // Elements for scroll reveal
 const revealNodes = document.querySelectorAll(".reveal");
+const COVER_HIDE_DELAY = 420;
 
 // Setup observer but don't observe yet
 const observer = new IntersectionObserver(
@@ -42,7 +43,7 @@ const unlockLetter = (observeDelay = 400, useTransition = true) => {
       coverPage.classList.add("is-opening");
       setTimeout(() => {
         coverPage.classList.add("is-hidden");
-      }, 420);
+      }, COVER_HIDE_DELAY);
     } else {
       coverPage.classList.add("is-hidden");
     }
