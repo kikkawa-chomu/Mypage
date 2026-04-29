@@ -191,7 +191,7 @@ if (backToTopButton) {
 }
 
 const interactiveCards = document.querySelectorAll(
-  ".spotlight-card, .mini-note-card, .overview-panel, .decision-statement, .feature-card, .timeline-content, .strength-card, .roadmap-card, .life-card, .final-card, .industry-card, .industry-facts, .section-glance-item",
+  ".spotlight-card, .mini-note-card, .overview-panel, .decision-statement, .feature-card, .timeline-content, .strength-card, .roadmap-card, .life-card, .final-card, .industry-card, .industry-facts, .section-glance-item, .acn-history-band, .acn-outlook-band",
 );
 
 interactiveCards.forEach((card) => {
