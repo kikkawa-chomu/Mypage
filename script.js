@@ -231,3 +231,25 @@ magneticButtons.forEach((button) => {
     button.style.transform = "";
   });
 });
+
+// --- Dynamic hero eyebrow date (uses current year.month) ---
+(() => {
+  try {
+    const heroEyebrow = document.querySelector('.hero-copy .eyebrow');
+    if (!heroEyebrow) return;
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+
+    // Preserve any trailing text starting with the first slash (e.g. " / M2 / Career Letter")
+    const suffixMatch = heroEyebrow.textContent.match(/\/.+$/);
+    const suffix = suffixMatch ? suffixMatch[0].trim() : ' / M2 / Career Letter';
+
+    heroEyebrow.textContent = `${year}.${month} ${suffix}`;
+  } catch (e) {
+    // Fail silently - UI should degrade gracefully
+    // eslint-disable-next-line no-console
+    console.error('Failed to set dynamic hero eyebrow date:', e);
+  }
+})();
