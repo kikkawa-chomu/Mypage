@@ -1746,7 +1746,7 @@ button:focus-visible {
     top: 48px;
     left: 1px;
     width: 10px;
-    height: calc(100% + 18px);
+    height: calc(100% - 10px);
     background: linear-gradient(180deg, rgba(152, 94, 241, 0.84), rgba(213, 173, 255, 0.92));
     clip-path: polygon(24% 0, 76% 0, 76% 86%, 100% 86%, 50% 100%, 0 86%, 24% 86%);
     box-shadow:
