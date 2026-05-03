@@ -1400,6 +1400,76 @@ button:focus-visible {
     linear-gradient(180deg, rgba(30, 17, 47, 0.9), rgba(13, 7, 22, 0.94));
 }
 
+/* Venn Diagram */
+.venn-wrap {
+  margin: 28px 0 24px;
+  text-align: center;
+  border: 0;
+  padding: 0;
+}
+
+.venn-svg {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.venn-caption {
+  margin: 8px auto 0;
+  font-size: 0.8rem;
+  color: var(--muted-2);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+/* Timeline Phase Icons */
+.timeline-phase-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.timeline-phase-wrap .timeline-phase {
+  margin: 0;
+}
+
+.phase-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--accent-3);
+  flex-shrink: 0;
+}
+
+/* Keyword Highlights */
+.key-phrase {
+  color: #f5eeff;
+  background-image: linear-gradient(
+    transparent calc(100% - 2px),
+    rgba(214, 164, 255, 0.6) calc(100% - 2px)
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  padding-bottom: 1px;
+}
+
+/* Signature */
+.signature-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.signature-img {
+  max-width: 180px;
+  height: auto;
+  opacity: 0.82;
+}
+
 .reveal {
   opacity: 0;
   transform: translateY(30px);
