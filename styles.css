@@ -1465,9 +1465,8 @@ button:focus-visible {
 }
 
 .signature-img {
-  max-width: 180px;
+  max-width: min(50vw, 360px);
   height: auto;
-  opacity: 0.82;
 }
 
 .reveal {
